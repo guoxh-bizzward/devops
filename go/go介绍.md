@@ -251,9 +251,32 @@ type 声明定义一个新的命名类型,它和某个已有类型使用相同�
 
 命名类型提供了一种方式来区分底层类型的不同或者不兼容使用,这样它们就不会在无意中混用
 
+```
+type Celsius float64
+type Fahrenheit float64
+
+const (
+	AbsoluteZeroC Celsius = -273.15
+	FreezingC Celsius = 0
+	BoilingC Celsius = 100
+)
+
+func FtoC(fahrenheit Fahrenheit) Celsius{
+	return Celsius((fahrenheit - 32) * 5 / 9) //需要进行显示的类型转换
+}
+
+func CtoF(celsius Celsius) Fahrenheit {
+	return Fahrenheit(celsius*9*5 - 32)
+}
+```
+
+对于每个类型T,都有一个对应的类型转换操作T(x)将值x转换为类型T
+
 ### 包和文件
 
+#### 导入
 
+#### 包初始化
 
 ### 作用域
 
