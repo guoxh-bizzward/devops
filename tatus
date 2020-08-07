@@ -1,0 +1,141 @@
+[33mcommit 3d29980aefc02da996d0c4f46e879b022238c2f8[m[33m ([m[1;36mHEAD -> [m[1;32mmaster[m[33m, [m[1;31morigin/master[m[33m, [m[1;31morigin/HEAD[m[33m)[m
+Author: 郭学和 <guoxh@yonyou.com>
+Date:   Fri Aug 7 18:26:55 2020 +0800
+
+    add jvm basic
+
+[33mcommit 9fc073705a0f7b375811ab12e82bc9df95d3e54b[m
+Merge: 3deb1b1 4531b0b
+Author: guoxh <guoxh@yonyou.com>
+Date:   Fri Aug 7 00:38:51 2020 +0800
+
+    erge branch 'master' of http://39.105.194.192:10080/guoxh/devops
+
+[33mcommit 3deb1b1e236a84e87dd434b8f866fc8f73ac5cbc[m
+Author: guoxh <guoxh@yonyou.com>
+Date:   Fri Aug 7 00:38:38 2020 +0800
+
+    add 面试 category
+
+[33mcommit 4531b0bd6e133a88dfea99fce672d24696913f6c[m
+Merge: c94c98c 3dfe8db
+Author: 郭学和 <guoxh@yonyou.com>
+Date:   Sun Aug 2 17:51:16 2020 +0800
+
+    Merge branch 'master' of http://39.105.194.192:10080/guoxh/devops
+
+[33mcommit c94c98c32ca721d07064092b62403f0abf8b359c[m
+Author: 郭学和 <guoxh@yonyou.com>
+Date:   Sun Aug 2 17:51:03 2020 +0800
+
+    mybatis延迟加载配置
+
+[33mcommit 3dfe8dbdbdb03302bd794c148d541f2a49ac6857[m
+Author: guoxh <guoxh@aliyun.com>
+Date:   Sat Aug 1 20:04:06 2020 +0800
+
+    add kafka
+
+[33mcommit e65dbb90d1dd5e49c6c78cace3e95cf342d326dd[m
+Merge: 589d686 2e9eeb7
+Author: guoxh <guoxh@yonyou.com>
+Date:   Sat Aug 1 10:56:07 2020 +0800
+
+    add vue
+
+[33mcommit 589d686792ac8e06d673d32a4697f876bdf7edf9[m
+Author: guoxh <guoxh@yonyou.com>
+Date:   Sat Aug 1 10:55:45 2020 +0800
+
+    add vue
+
+[33mcommit 2e9eeb74f78057340a59d7a8abff9ceb3c1f9b8d[m
+Author: 郭学和 <guoxh@yonyou.com>
+Date:   Thu Jul 30 21:25:12 2020 +0800
+
+    kafka
+
+[33mcommit 168fda7c0b9a822025d488bc6b35fac7f1437c5f[m
+Author: guoxh <guoxh@yonyou.com>
+Date:   Mon Jul 27 16:33:43 2020 +0800
+
+    add kafka install md
+
+[33mcommit 416680c6af501168553ff1322e4a5a551b3fde47[m
+Author: guoxh <guoxh@yonyou.com>
+Date:   Mon Jul 27 01:11:29 2020 +0800
+
+    go程序设计语言
+
+[33mcommit 892de44ebb527f18049dfbdad2467556d15ebc1c[m
+Author: guoxh <guoxh@yonyou.com>
+Date:   Sat Jul 25 01:11:04 2020 +0800
+
+    fastdfs java
+
+[33mcommit 0bcc89fb6ffc0a5dc5bba1888bf3404029d4455a[m
+Author: 郭学和 <guoxh@yonyou.com>
+Date:   Fri Jul 24 18:32:07 2020 +0800
+
+    add fastdfs
+
+[33mcommit 791187b4fa36582eaefeca341e461daafc7f3b4f[m
+Merge: 967ecec 29196a9
+Author: 郭学和 <guoxh@yonyou.com>
+Date:   Thu Jul 23 20:57:55 2020 +0800
+
+    Merge branch 'master' of http://39.105.194.192:10080/guoxh/devops
+
+[33mcommit 967ececafb85fa09e716cde337c1cb5f6b9d56b2[m
+Author: 郭学和 <guoxh@yonyou.com>
+Date:   Thu Jul 23 20:57:35 2020 +0800
+
+    add redis & nginx
+
+[33mcommit 29196a9f31c201130bbb3568bf182faf6323389e[m
+Author: guoxh <guoxh@yonyou.com>
+Date:   Thu Jul 23 00:16:51 2020 +0800
+
+    add distribution id
+
+[33mcommit c231820fe436a40147f0fdb345436296e3db8787[m
+Author: guoxh <guoxh@yonyou.com>
+Date:   Wed Jul 22 22:18:33 2020 +0800
+
+    docker常用命令
+
+[33mcommit 4211ad2dd0f081843844bd9b0d8b61e3afc83329[m
+Author: guoxh <guoxh@yonyou.com>
+Date:   Wed Jul 22 20:37:38 2020 +0800
+
+    add springboot test junit5
+
+[33mcommit dbd35f010760623c26aea42c14c95114fbc622b0[m
+Author: 郭学和 <guoxh@yonyou.com>
+Date:   Wed Jul 22 20:16:03 2020 +0800
+
+    add docker
+
+[33mcommit b74560bd880617eef1bfbd72eade046f81381854[m
+Author: guoxh <gxuehe@aliyun.com>
+Date:   Sun Jul 19 17:19:35 2020 +0800
+
+    add cache
+
+[33mcommit 8dcc70886191a20e42edb7ba6ef84e4e7e9ed92e[m
+Author: guoxh <guoxh@yonyou.com>
+Date:   Sun Jul 19 11:19:27 2020 +0800
+
+    add redis
+
+[33mcommit 314320a2b6b836333ae20d649673e10b6dc242d0[m
+Author: guoxh <gxuehe@aliyun.com>
+Date:   Fri Jul 17 18:48:51 2020 +0800
+
+    devops init
+
+[33mcommit 9b080f82072db4556154afa80d37419a019262c7[m
+Author: guoxh <gxuehe@aliyun.com>
+Date:   Tue Jul 14 01:20:08 2020 +0000
+
+    Initial commit
