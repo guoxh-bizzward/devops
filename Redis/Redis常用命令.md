@@ -124,7 +124,7 @@ redis-cli -h localhost -p 6379 -a 123456
 
 > mset key value [key value ...]
 
-* t同时设置一个或者多个key-value对,当且仅当所有给定key 均不存在
+* 同时设置一个或者多个key-value对,当且仅当所有给定key 均不存在
 
 > msetnx key value [key value...]
 
