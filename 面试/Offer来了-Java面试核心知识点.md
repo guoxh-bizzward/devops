@@ -283,3 +283,17 @@ while(true){
 
 ## JVM 类加载机制
 
+### 类加载器
+
+* 启动类加载器  JAVA_HOME/lib 或 Xbootclasspath
+* 扩展类加载器 JAVA_HOME/ext/lib 或者 使用 java.ext.dirs
+* 应用程序类加载器 加载用户路径 classpath上的类库
+
+### 双亲委派
+
+保障类的唯一性和安全性
+
+
+
+## Java基础
+
