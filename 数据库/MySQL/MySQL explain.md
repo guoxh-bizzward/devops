@@ -35,15 +35,15 @@ explain 可以用来分析SQL语句和表结构的性能瓶颈.通过explain结�
 
 `explain select * from t_user;`
 
-![image-20201015104159382](../imgs/MySQL explain 01.png)
+![image-20201015104159382](../../imgs/MySQL explain 01.png)
 
 `explain select (select 1 from t_group_user t2) from (select * from t_user where user_Id=1) t1`
 
-![image-20201015145902059](../imgs/MySQL explain 02.png)
+![image-20201015145902059](../../imgs/MySQL explain 02.png)
 
 `explain select 1 union all select 2 from dual`
 
-![image-20201015150450679](../imgs/MySQL explain 03.png)
+![image-20201015150450679](../../imgs/MySQL explain 03.png)
 
 explain结果列说明
 

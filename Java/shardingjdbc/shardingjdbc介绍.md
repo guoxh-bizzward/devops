@@ -42,4 +42,4 @@
 
 ## Shardingjdbc架构图
 
-![img](../imgs/shardingjdbc架构图)
+![img](../../imgs/shardingjdbc架构图.png)
