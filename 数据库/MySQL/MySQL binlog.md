@@ -25,11 +25,9 @@ redo log不是随事务的提交而写入的,而是在事务的执行过程中,�
 
 
 
+![image-20200714104338897](../../imgs/mysqlredolog.png)
 
-
-![image-20200714104338897](D:\workspace\devops\imgs\mysql redo log.png)
-
-![image-20200714110605373](D:\workspace\devops\imgs\mysql undo log.png)
+![image-20200714110605373](../../imgs/mysqlundolog.png)
 
 
 
