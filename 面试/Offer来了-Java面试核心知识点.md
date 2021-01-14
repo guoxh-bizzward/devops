@@ -161,7 +161,7 @@ java对象的操作是通过该对象的引用(Reference)实现的
 
 基于复制算法实现,是一个单线程收集器.在它进行垃圾收集时,必须单暂停其他所有工作线程,知道垃圾收集结束.
 
-Serial 浏览器是Java虚拟机运行在Client模式下新生代的默认垃圾收集器
+Serial 是Java虚拟机运行在Client模式下新生代的默认垃圾收集器
 
 
 
@@ -296,4 +296,171 @@ while(true){
 
 
 ## Java基础
+
+### 集合
+
+* List
+  * ArrayList
+  * LinkedList
+  * Vector
+* Queue
+  * ArrayBlockingQueue
+  * LinkedBlockingQueue
+  * PriorityBlockingQueue
+  * DelayQueue
+  * SychronousQueue
+  * LinkedTransferQueue
+  * LinkedBlockingDueue
+* Set
+  * HashSet
+  * TreeSet
+  * LinkedSet
+* Map
+  * HashMap
+  * HashTable
+  * TreeMap
+
+### 异常分类以及处理
+
+Throwable
+
+​	Error
+
+​	Exception
+
+​		checked Exception SQLException IOException FileNotFound...
+
+​		RuntimeException eg NullPointer ClassCast ArrayIndexOutBounds...
+
+### 反射机制
+
+Java反射创建对象的两种方式
+
+1. 使用newInstance创建该Class对象的对应实例,需要Class对象有默认的无参构造函数
+2. 先使用Class对象获取指定的constructor对象,再调用constructor对象的newInstance方法创建class对象.
+
+### 注解
+
+@Target
+
+@Retention
+
+@Documented
+
+@Inherited
+
+### 内部类
+
+静态内部类
+
+成员内部类
+
+局部内部类
+
+匿名内部类
+
+### 泛型
+
+泛型标记和泛型限定 E T K V N ?
+
+* E Element 在集合中使用,表示集合中存放的元素
+* T Type 表示Java类中的基本类和自定义类型
+* K Key 表示键 比如Map中的Key
+* V value 表示值
+* N Number 数值类型
+* ? 不确定的Java类型
+* List<? extends T> 上限 表示类都是 T的子类
+* List<? super T> 下限 表示类都是 T的父类
+
+类型擦除
+
+
+
+### 序列化
+
+## Java 并发编程
+
+### Java线程的创建方式
+
+
+
+### 线程池工作原理
+
+
+
+### 5种常用线程池
+
+
+
+### 线程的生命周期
+
+
+
+### 线程的基本方法
+
+
+
+### Java 中的锁
+
+
+
+### 线程上下文切换
+
+
+
+### Java 阻塞队列
+
+
+
+### Java并发关键字
+
+
+
+### 多线程共享数据
+
+
+
+### ConcurrentHashMap并发
+
+
+
+### Java 线程调度
+
+
+
+### 进程调度算法
+
+
+
+### CAS
+
+
+
+### ABA问题
+
+
+
+### AQS
+
+## 数据结构
+
+
+
+## 算法
+
+
+
+## 网络与负载均衡
+
+
+
+## 数据库与分布式事务
+
+
+
+## 分布式缓存的原理和应用
+
+
+
+## 设计模式
 
