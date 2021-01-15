@@ -378,23 +378,72 @@ Java反射创建对象的两种方式
 
 ### 序列化
 
+对象序列化保存的是对象的状态,即它的成员变量,所以类中的静态变量不会保存;
+
 ## Java 并发编程
 
 ### Java线程的创建方式
 
+继承Thread类
 
+实现Runnable接口
+
+通过ExecutorService和Callable<Class>实现有返回值的线程;
+
+基于线程池;
 
 ### 线程池工作原理
 
+JVM先根据用户的参数创建一定数量的可运行的线程任务,并将其放入队列中,在线程创建后启动这些任务,如果线程数量超过最大线程数量,则超出数量的线程排队等候,在有任务执行完毕后,线程池调度器会发现有可用线程,进入再次从队里中取出任务并执行;
 
+线程池的主要作用是线程服用,线程资源管理,控制操作系统的最大并发数;
+
+Java线程池主要由以下4个核心组件组成
+
+* 线程池管理器 用于创建并管理线程池
+* 工作线程 线程池中执行具体任务的线程
+* 任务接口 用于定义工作线程的调度和执行策略,只有线程实现了该接口,线程中的任务才能够被线程池调度
+* 任务队列 存放待处理的任务
+
+Java中的线程池是通过Executor框架实现的,在该框架中用到了Executor,Executors,ExecutorService,ThreadPoolExecutor,Callabe,Future,FuterTask这几个核心类.
+
+线程池拒绝策略
+
+* AbortPolicy 直接抛出异常,拒绝执行
+* CallerRunsPolicy 如果被丢弃的线程任务未关闭,则执行该线程任务(由当前线程执行被丢弃的任务,会导致主线程阻塞);
+* DiscardOldestPolicy 移除线程队列中最早的一个线程任务,并尝试提交当前任务
+* DiscardPolicy 丢弃当前的线程任务而不做任何处理
+* 自定义拒绝策略
 
 ### 5种常用线程池
 
+newCachedThreadPool
 
+newFixedThreadPool
+
+newScheduledTheadPool
+
+newSingleThreadPool
+
+newSingleThreadScheduledExecutor
+
+newWorkStealingPool
 
 ### 线程的生命周期
 
+* New 新建状态
 
+* Runable 就绪状态
+* Running 运行态
+* Blocked 阻塞状态
+
+运行中的线程会主动或被动的放弃CPU使用权并暂停运行,此时该线程转为阻塞状态,直到再次进入可运行状态,才有机会竞争到CPU使用权并转为运行态.阻塞的状态分为三种
+
+1. 等待阻塞
+2. 同步阻塞
+3. 其他阻塞 
+
+* Dead 死亡
 
 ### 线程的基本方法
 
