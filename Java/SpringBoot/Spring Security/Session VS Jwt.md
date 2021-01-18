@@ -8,7 +8,51 @@ jwt = json web token ,是一种json风格的轻量级的授权和身份认证规
 
 JWT 作为一种规范，并没有和某一种语言绑定在一起，常用的 Java 实现是 GitHub 上的开源项目 jjwt，地址如下：`https://github.com/jwtk/jjwt`
 
+### JWT 数据格式
 
+- Header
+
+  - 声明类型 JWT
+  - 加密算法 自定义
+
+  我们会对头部进行base64url编码(可解码),得到第一部分数据
+
+- Payload 荷载 就是有效数据,在官方文档(RFC7519),这里给了7个示例信息
+
+  - iss(issuser)
+  - exp(expiration time)
+  - sub(subject)
+  - aud(audience)
+  - nbf(not before)
+  - iat(Issued At)
+  - jti(JWT id)
+
+  这部分也会采用base4url编码,可以得到第二部分数据
+
+- Signature 签名,是整个数据的认证信息.一般根据前两步的数据，再加上服务的的密钥 secret（密钥保存在服务端，不能泄露给客户端），通过 Header 中配置的加密算法生成。用于验证整个数据完整和可靠性。
+
+JWT 生成的数据格式如下
+
+```
+"access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOlsicmVzMSJdLCJ1c2VyX25hbWUiOiJqYXZhYm95Iiwic2NvcGUiOlsiYWxsIl0sImV4cCI6MTYxMTAyNzU0MSwiYXV0aG9yaXRpZXMiOlsiUk9MRV91c2VyIl0sImp0aSI6ImZkZDY4YjQyLTE1MmMtNGI0NC05YTEwLWFhZjEyMTRkNTYzNSIsImNsaWVudF9pZCI6ImphdmFib3kifQ._ETBwzH0MyUNX2yCzgtB9Siudws_IVx5LMTTaQ5RDxA"
+```
+
+### JWT交互流程
+
+1. 应用程序或客户端向授权服务器请求授权
+2. 获取授权后,授权服务器会向应用程序返回访问令牌
+3. 应用程序使用访问令牌来访问受保护资源
+
+```
+因为JWT签发的token中已经包含了用户的身份信息,并且每次请求都会携带,这样服务就无需保存用户信息,设置无需去查询数据,这样就符合了Restful的无状态规范
+```
+
+### JWT 存在的问题
+
+* 续签问题
+* 注销问题
+* 密码重置
+* 建议不同用户取不同的secret
 
 ## 有状态 VS 无状态
 

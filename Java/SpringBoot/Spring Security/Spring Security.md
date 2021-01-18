@@ -343,3 +343,61 @@ deleteCookies
 clearAuthentication 和 invalidateHttpSession 分别用来表示清除认证信息和使httpsession失效.默认可以不用配置,默认就可以清除
 
 ## 前后端分离
+
+### 前后端分离交互方式
+
+在前后端分离这样的开发架构下，前后端的交互都是通过 JSON 来进行，无论登录成功还是失败，都不会有什么服务端跳转或者客户端跳转之类。
+
+登录成功，服务端就返回一段登录成功的提示 JSON 给前端，前端收到之后，该跳转该展示，由前端自己决定，就和后端没有关系了
+
+登录失败，服务端就返回一段登录失败的提示 JSON 给前端，前端收到之后，该跳转该展示，由前端自己决定，也和后端没有关系了
+
+### 登录成功
+
+successHandler
+
+```
+                .successHandler((req,resp,authentication) ->{
+                    Object principal = authentication.getPrincipal();
+                    resp.setContentType("application/json;charset=utf-8");
+                    PrintWriter pw = resp.getWriter();
+                    pw.write(new ObjectMapper().writeValueAsString(principal));
+                    pw.flush();
+                    pw.close();
+                })
+```
+
+
+
+```
+public interface AuthenticationSuccessHandler {
+    default void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authentication) throws IOException, ServletException {
+        this.onAuthenticationSuccess(request, response, authentication);
+        chain.doFilter(request, response);
+    }
+
+    void onAuthenticationSuccess(HttpServletRequest var1, HttpServletResponse var2, Authentication var3) throws IOException, ServletException;
+}
+```
+
+调用接口返回值
+
+http://localhost:8092/login
+
+```
+{
+    "password": null,
+    "username": "javabody",
+    "authorities": [
+        {
+            "authority": "ROLE_admin"
+        }
+    ],
+    "accountNonExpired": true,
+    "accountNonLocked": true,
+    "credentialsNonExpired": true,
+    "enabled": true
+}
+```
+
+可以看到密码已经被擦除了.
