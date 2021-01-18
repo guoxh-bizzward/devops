@@ -115,6 +115,8 @@ public interface PasswordEncoder {
 }
 ```
 
+## 前后端不分离
+
 ### 自定义登录页
 
 ```
@@ -294,7 +296,50 @@ username 和password 来自于`org.springframework.security.web.authentication.U
 * 前后端分离登录
 * 前后端不分登录
 
+#### 登陆成功回调
+
 Spring Security中,和登录成功重定向URL相关的方法有两个
 
 * defaultSuccessUrl
 * successForwardUrl
+
+配置的时候,两者只需要配置一个即可,具体配置那个则需要看你的需求,两者的区别如下:
+
+1. defaultSuccessUrl 有一个重载的方法，我们先说一个参数的 defaultSuccessUrl 方法。如果我们在 defaultSuccessUrl 中指定登录成功的跳转页面为 `/index`，此时分两种情况，如果你是直接在浏览器中输入的登录地址，登录成功后，就直接跳转到 `/index`，如果你是在浏览器中输入了其他地址，例如 `http://localhost:8080/hello`，结果因为没有登录，又重定向到登录页面，此时登录成功后，就不会来到 `/index` ，而是来到 `/hello` 页面。
+2. defaultSuccessUrl 还有一个重载的方法，第二个参数如果不设置默认为 false，也就是我们上面的的情况，如果手动设置第二个参数为 true，则 defaultSuccessUrl 的效果和 successForwardUrl 一致。
+3. successForwardUrl 表示不管你是从哪里来的，登录后一律跳转到 successForwardUrl 指定的地址。例如 successForwardUrl 指定的地址为 `/index` ，你在浏览器地址栏输入 `http://localhost:8080/hello`，结果因为没有登录，重定向到登录页面，当你登录成功之后，就会服务端跳转到 `/index` 页面；或者你直接就在浏览器输入了登录页面地址，登录成功后也是来到 `/index`。
+
+#### 登陆失败回调
+
+与登陆成功相似,登陆失败也是两个方法
+
+* failureForwardUrl
+* failureUrl
+
+这两个方法在设置的时候也是只设置一个即可.failureForwardUrl是登陆失败之后会发生服务端跳转,failureUrl则是在登陆失败之后,发生重定向.
+
+### 注销登陆
+
+注销登陆的默认接口是/logout.
+
+```
+                .logout().logoutUrl("/logout")
+                .logoutRequestMatcher(new AntPathRequestMatcher("/logout","POST"))
+                .logoutSuccessUrl("/index")
+                .deleteCookies()
+                .clearAuthentication(true)
+                .invalidateHttpSession(true)
+                .permitAll()
+```
+
+默认注销的url是/logout,是一个get请求,可以通过logoutUrl方法来修改默认的注销URL
+
+logoutRequestMatcher方法不仅可以修改注销URL,还可以修改请求方式,实际项目中,这个方法和logoutUrl任意设置一个即可
+
+logoutSuccessUrl表示注销成功后要跳转的页面
+
+deleteCookies
+
+clearAuthentication 和 invalidateHttpSession 分别用来表示清除认证信息和使httpsession失效.默认可以不用配置,默认就可以清除
+
+## 前后端分离
