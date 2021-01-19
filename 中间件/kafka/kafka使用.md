@@ -1,5 +1,13 @@
 # Kafka
 
+https://juejin.cn/post/6918898595408117773
+
+
+
+https://mp.weixin.qq.com/s?__biz=MzA4MTc4NTUxNQ==&mid=2650520278&idx=1&sn=2493fdf575043975ffd9dcf9a170ab26&chksm=8780bd12b0f734048a87da21c84c4e214c4a8b4619596c0c876b166725a7545cd75baba601d9&scene=21#wechat_redirect
+
+
+
 ## Kafka应用场景
 
 * 活动跟踪

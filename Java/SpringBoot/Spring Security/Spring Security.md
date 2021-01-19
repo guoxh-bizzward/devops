@@ -352,7 +352,7 @@ clearAuthentication 和 invalidateHttpSession 分别用来表示清除认证信�
 
 登录失败，服务端就返回一段登录失败的提示 JSON 给前端，前端收到之后，该跳转该展示，由前端自己决定，也和后端没有关系了
 
-### 登录成功
+### 登录成功回调
 
 successHandler
 
@@ -401,3 +401,133 @@ http://localhost:8092/login
 ```
 
 可以看到密码已经被擦除了.
+
+### 登陆失败回调
+
+```
+.failureHandler((req,resp,e)->{
+                    resp.setContentType("application/json;charset=utf-8");
+                    PrintWriter pw = resp.getWriter();
+                    pw.write(e.getMessage());
+                    pw.flush();
+                    pw.close();
+                })
+```
+
+###  用户名查找失败异常
+
+在Spring Security中,用户名查找失败对应的异常是`UsernameNotFoundException`,密码匹配失败对应的异常是`BadClientCredentialsException`;
+
+但是我们在登陆失败的回调中,却看不到`UsernameNotFoundException`异常,无论用户名还是密码错误,抛出的异常都是`BadClientCredentialsException`
+
+这是因为在登陆中有一个关键步骤,就是加载用户数据
+
+```
+public Authentication authenticate(Authentication authentication)
+			throws AuthenticationException {
+		Assert.isInstanceOf(UsernamePasswordAuthenticationToken.class, authentication,
+				() -> messages.getMessage(
+						"AbstractUserDetailsAuthenticationProvider.onlySupports",
+						"Only UsernamePasswordAuthenticationToken is supported"));
+
+		// Determine username
+		String username = (authentication.getPrincipal() == null) ? "NONE_PROVIDED"
+				: authentication.getName();
+
+		boolean cacheWasUsed = true;
+		UserDetails user = this.userCache.getUserFromCache(username);
+
+		if (user == null) {
+			cacheWasUsed = false;
+
+			try {
+				user = retrieveUser(username,
+						(UsernamePasswordAuthenticationToken) authentication);
+			}
+			catch (UsernameNotFoundException notFound) {
+				logger.debug("User '" + username + "' not found");
+
+				if (hideUserNotFoundExceptions) {
+					throw new BadCredentialsException(messages.getMessage(
+							"AbstractUserDetailsAuthenticationProvider.badCredentials",
+							"Bad credentials"));
+				}
+				else {
+					throw notFound;
+				}
+			}
+
+```
+
+可以看到当抛出`UsernameNotFoundException`异常后,有个`hideUserNotFoundExceptions`属性,如果这个属性为true,则抛出`BadCredentialsException`.默认情况下这个属性都是true.
+
+一般来说这个配置是不需要修改的,如果一定要区别出来,这里提供三种思路
+
+* 自定义`DaoAuthenticationProvider`替代默认的,在定义时将`hideUserNotFoundExceptions`设置为false
+* 当用户查找失败时,不抛出`UsernameNotFoundException`异常,而是抛出一个自定义异常,这样自定义异常就不会被隐藏,进而在登陆失败的回调中根据自定义异常信息给前端一个提示
+* 当用户查找失败时,直接抛出`BadCredentialsException`,但是异常信息为`用户不存在`
+
+### 未认证处理方案
+
+在前后端分离的方案中,不应该让用户重定向到登录页,而是给用户一个尚未登录的提示,前端收到这个提示后,再自行决定页面跳转.
+
+要解决这个问题,就涉及到Spring Security中的一个接口`AuthenticationEntryPoint`,这个接口有一个实现类`LoginUrlAuthenticationEntryPoint`,类中有一个方法`commence`
+
+```
+    public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) throws IOException, ServletException {
+        String redirectUrl = null;
+        if (this.useForward) {
+            if (this.forceHttps && "http".equals(request.getScheme())) {
+                redirectUrl = this.buildHttpsRedirectUrlForRequest(request);
+            }
+
+            if (redirectUrl == null) {
+                String loginForm = this.determineUrlToUseForThisRequest(request, response, authException);
+                if (logger.isDebugEnabled()) {
+                    logger.debug("Server side forward to: " + loginForm);
+                }
+
+                RequestDispatcher dispatcher = request.getRequestDispatcher(loginForm);
+                dispatcher.forward(request, response);
+                return;
+            }
+        } else {
+            redirectUrl = this.buildRedirectUrlToLoginPage(request, response, authException);
+        }
+
+        this.redirectStrategy.sendRedirect(request, response, redirectUrl);
+    }
+```
+
+这个方法是用来决定是否要重定向还是forward.默认情况下,`useForward`的值为false,所以请求进行了重定向.
+
+解决这个问题的思路很简单,重写这个方法,在这个方法中返回json,不做重定向操作.
+
+```
+.and()
+                .exceptionHandling()
+                .authenticationEntryPoint((req,resp,ex)->{
+                    resp.setContentType("application/json;charset=utf-8");
+                    PrintWriter pw = resp.getWriter();
+                    pw.write("尚未登录,请先登录");
+                    pw.flush();
+                    pw.close();
+                })
+```
+
+### 注销登陆
+
+使用logoutSuccessHandler
+
+```
+                .and()
+                .logout().logoutUrl("/logout")
+                .logoutSuccessHandler((req,resp,authentication)->{
+                    resp.setContentType("application/json;charset=utf-8");
+                    PrintWriter pw = resp.getWriter();
+                    pw.write("注销成功");
+                    pw.flush();
+                    pw.close();
+                })
+```
+

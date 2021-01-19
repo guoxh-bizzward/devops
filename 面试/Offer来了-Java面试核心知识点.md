@@ -415,27 +415,27 @@ Java中的线程池是通过Executor框架实现的,在该框架中用到了Exec
 * DiscardPolicy 丢弃当前的线程任务而不做任何处理
 * 自定义拒绝策略
 
-### 5种常用线程池
+### 常用线程池
 
-newCachedThreadPool
+* `newCachedThreadPool`
 
-newFixedThreadPool
+* `newFixedThreadPool`
 
-newScheduledTheadPool
+* `newScheduledTheadPool`
 
-newSingleThreadPool
+* `newSingleThreadExecutor`
 
-newSingleThreadScheduledExecutor
+* `newSingleThreadScheduledExecutor`
 
-newWorkStealingPool
+* `newWorkStealingPool`
 
 ### 线程的生命周期
 
-* New 新建状态
+* `New` 新建状态
 
-* Runable 就绪状态
-* Running 运行态
-* Blocked 阻塞状态
+* `Runable` 就绪状态
+* `Running` 运行态
+* `Blocked` 阻塞状态
 
 运行中的线程会主动或被动的放弃CPU使用权并暂停运行,此时该线程转为阻塞状态,直到再次进入可运行状态,才有机会竞争到CPU使用权并转为运行态.阻塞的状态分为三种
 
