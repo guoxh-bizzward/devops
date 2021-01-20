@@ -182,7 +182,7 @@ form表单相关的配置在`org.springframework.security.config.annotation.web.
 	}
 ```
 
-另一方面,`FormLoginConfigurer``的初始化方法init方法也调用了父类的init方法
+另一方面,`FormLoginConfigurer`的初始化方法init方法也调用了父类的init方法
 
 ```
 	@Override
@@ -401,6 +401,40 @@ http://localhost:8092/login
 ```
 
 可以看到密码已经被擦除了.
+
+### 密码擦除逻辑
+
+`org.springframework.security.authentication.ProviderManager#authenticate`
+
+```java
+		if (result != null) {
+			if (eraseCredentialsAfterAuthentication
+					&& (result instanceof CredentialsContainer)) {
+				// Authentication is complete. Remove credentials and other secret data
+				// from authentication
+				((CredentialsContainer) result).eraseCredentials();
+			}
+
+			// If the parent AuthenticationManager was attempted and successful then it will publish an AuthenticationSuccessEvent
+			// This check prevents a duplicate AuthenticationSuccessEvent if the parent AuthenticationManager already published it
+			if (parentResult == null) {
+				eventPublisher.publishAuthenticationSuccess(result);
+			}
+			return result;
+		}
+```
+
+有一个属性是`eraseCredentialsAfterAuthentication`,这个值为true,就会执行`((CredentialsContainer) result).eraseCredentials();`而这段代码就是清除认证信息的
+
+```
+	public void eraseCredentials() {
+		eraseSecret(getCredentials());
+		eraseSecret(getPrincipal());
+		eraseSecret(details);
+	}
+```
+
+
 
 ### 登陆失败回调
 
