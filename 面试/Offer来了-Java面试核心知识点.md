@@ -452,10 +452,158 @@ Java中的线程池是通过Executor框架实现的,在该框架中用到了Exec
 ### 线程的基本方法
 
 * wait 在调用wait方法后会释放对象的锁,所以wait方法一般被用于同步方法或同步代码块中,线程会进入 WAITING 状态
+
 * sleep sleep方法不会释放当前占有的锁,会导致线程进入 TIME-WAITING状态
-* yield 线程让步 调永yield方法会使当前线程让出(释放)CPU执行时间片,与其他线程一起竞争CPU时间片.
+
+* yield 线程让步 调用 yield方法会使当前线程让出(释放)CPU执行时间片,与其他线程一起竞争CPU时间片.
+
+* interrupt 线程中断 该方法用于向线程发出一个终止通知信号,会影响该线程内部的一个中断标识,这个线程本身并不会因为调用了Interrupt方法而改变状态(阻塞,终止等).状态的具体变化需要等待接收到中断标识的程序的最终处理结果来判定.对interrupt方法的理解要注意以下4个核心点
+
+  * 调用interrupt方法并不会中断一个正在运行的线程,也就是说处于running状态的线程并不会因为中断而终止,仅仅改变了内部维护的中断标示位而已.具体的jdk源码如下
+
+  ```
+  public static boolean interrupted(){
+  	return currentThread().isInterrupted(true);
+  }
+  public boolean isInterrupted(){
+  	return isInterrupted(false);
+  }
+  ```
+
+  * 若因为调用sleeep方法而使线程处理time_waiting状态,则这时调用interrupt方法会抛出interruptedException,使线程提前结束Time_waiting状态
+  * 许多声明抛出interruptException的方法比如Thread.sleep(),在抛出异常前都会清除中断标示位,所以在抛出异常后调用isInterrupted方法将会返回false
+  * 中断状态是线程固有的一个标示位,可以通过此标示位安全的终止线程.比如在想终止一个线程时,可以先调用该线程的interrupt方法,然后在线程的run方法中根据该线程的interrupted方法的返回状态值安全终止线程
+
+  ```
+  
+  ```
+
+  
+
+* join 线程加入 join方法用于等待其他线程终止,如果在当前线程中调用一个线程的join方法,则当前线程转为阻塞状态,等到另一个线程结束,当前线程再由阻塞状态转为就绪状态,等待获取CPU使用权.
+
+```
+//很多情况下,主线程生成并启动了子线程,需要等到子线程返回结果并收集和处理再退出.这时就要用到join方法,具体的使用方法如下
+System.out.println("子线程运行开始");
+ChildThread childThread = new ChildThread();
+childThread.join();//等待子线程childThread执行结束
+System.out.println("子线程结束,开始运行主线程");
+```
+
+
+
+* notify 线程唤醒 Object对象方法.用于唤醒在此对象监视器上等待的一个线程,如果所有线程都在此对象上等待,则会选择唤醒其中一个线程,选择是随机的.
+
+```
+我们通常调用其中一个对象的wait方法在此对象监视器上等待,直到当前线程放弃此对象上的锁定,才能继续执行被唤醒的线程,被唤醒的线程将以常规方式与此对象上主动同步的其他线程竞争.类似的方法还是notifyAll,用于唤醒在监听器上等待的所有线程.
+```
+
+* setDaemon 后台守护线程 也叫服务线程 这种线程有一个特性即为用户提供公共服务,在没有用户线程可服务时会自动离开
+
+```
+
+```
+
+* sleep wait 区别
+  * sleep属于Thread类,wait属于Object类
+  * sleep方法暂停执行指定时间,让出CPU给其他线程,但其监控状态依然保持,在指定时间过后又会自动恢复运行状态
+  * 在调用sleep方法的过程中,线程不会释放对象锁
+  * 在调用wait方法时,线程会放弃对象锁,进入等待此对象的等待锁池,只有针对此对象调用notify方法后,该线程才能进入对象锁池获取对象锁,并进入运行状态
+* start 和run方法的区别
+  * start属于启动线程,真正实现了多线程.在调用了线程的start方法后,线程会在后台执行,无须等待run方法体的代码执行完毕,就可以继续执行下面的代码
+  * 通过调用thread类的start方法启动一个线程时,此线程处于就绪状态,并没有运行
+  * run方法也叫做线程体,包含了要执行的线程的逻辑代码,在调用run犯法后,线程就进入运行状态,开始运行run方法中的代码.在run方法运行结束后,该线程终止,CPU再调度其他线程.
+
+#### 终止线程的4种方式
+
+1. 正常结束
+2. 使用退出标志退出线程
+3. 使用interrupt方法终止线程
+4. 使用stop方法终止线程,不安全不推荐
 
 ### Java 中的锁
+
+Java中的锁主要用于保障多并发线程情况下数据的一致性.
+
+锁从乐观和悲观的角度分为乐观锁和悲观锁,从获取资源的公平性角度分为公平锁和非公平锁,从是否共享的角度分为共享锁和独占锁,从锁的状态角色可以分为偏向锁,轻量级锁和重量级锁.
+
+在JVM中还巧妙设计了自旋锁以更快的使用CPU资源.
+
+#### 乐观锁
+
+大部分是通过CAS(Compare And Swap,比较和交换)实现
+
+#### 悲观锁
+
+大部分是通过AQS(Abstract Queued Synchronized,抽象的队列同步器)架构实现
+
+```
+AQS定义了一套多线程访问共享资源的同步框架,许多同步类的实现都依赖于他,例如常用的Synchronized,ReentrantLock,Semphore,CountDownLatch等.该框架下的锁会先尝试以CAS乐观锁去获取锁,如果获取不到,则会转为悲观锁(比如RetreenLock)
+```
+
+####  自旋锁
+
+
+
+#### Synchronized
+
+
+
+#### ReentrantLock
+
+
+
+#### Synchronized VS ReentrantLock
+
+
+
+#### Semaphore
+
+
+
+#### CountDownLatch
+
+
+
+#### AtomicInteger
+
+
+
+#### 可重入锁
+
+
+
+#### 公平锁 非公平锁
+
+
+
+#### 读写锁 ReadWriteLock
+
+
+
+#### 共享锁和独占锁
+
+
+
+#### 重量级锁和轻量级锁
+
+
+
+#### 偏向锁
+
+
+
+#### 分段锁
+
+
+
+#### 同步锁和死锁
+
+
+
+#### 如何进行锁优化
+
+
 
 
 
