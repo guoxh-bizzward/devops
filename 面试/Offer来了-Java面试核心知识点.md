@@ -577,14 +577,22 @@ Java中每个对象都有个monitor对象,加锁就是在竞争monitor对象.对
 
 在synchronized内部包括ContentionList,EntryList,WaitSet,OnDeck,Owner,!Owner 6个区域,每个区域的数据都代表锁的不同状态
 
-* ContentionList
-* EntryList
-* WaitSet
-* OnDeck
-* Owner
-* !Owner
+* ContentionList 锁竞争队列,所有请求锁的线程都被放在竞争队列中
+* EntryList 竞争候选者列表 在ContentionList中有资格成为候选者来竞争锁资源的线程被移动到EntryList中
+* WaitSet 等待集合,调用wait方法后被阻塞的线程将被放在WaitSet集合中 (notify/notifyAll唤醒的是这里的线程)
+* OnDeck 竞争候选者 在同一时刻最多只有一个线程在竞争锁资源,该线程的状态为OnDeck
+* Owner 竞争到锁资源的线程被称为Owner状态线程
+* !Owner 在Owner线程释放锁后,会从Owner变成 !Owner
 
 synchronized在收到新的锁请求时会首先自旋,如果通过自旋也没有获取到锁资源,则将被放入锁竞争队列ContentionList中.该方式对已经进入队列的线程是不公平的,因此synchronized是非公平锁.另外,自旋获取锁的线程也可以直接抢占OnDeck线程的锁资源.
+
+```
+为了防止锁竞争时ContentionList尾部的元素被大量的并发线程CAS访问而影响性能,Owner线程在释放锁资源的时候将ContentionList中的部分线程移动到EntryList中,并制定EntryList中的某个线程(一般是最先进入的线程)为OnDeck线程.Onwer并不会直接把锁传递个OnDeck线程,而是把锁竞争的权利交给Ondeck.让Ondeck去重新竞争锁.在Java中把该行为成为"竞争切换",该行为牺牲了公平性,但提高了性能.
+获取到锁资源的Ondeck线程会变成Owner线程,而未获取到锁资源的线程仍然停留在EntryList中.
+Owner线程在被wait方法阻塞后,会被转移到WaitSet队列中,直到某个时刻被notify/notifyAll唤醒,会再次进入EntryList中.ContentionList,EntryList,WaitSet中的线程均为阻塞状态,该阻塞是由操作系统完成(在Linux内核下采用pthread_mutex_lock内核函数完成)
+```
+
+
 
 synchronized是一个重量级锁,需要调用操作系统的相关接口,性能较低,给线程加锁的时间有可能超过获取锁后具体逻辑代码的操作时间;
 
