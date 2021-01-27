@@ -1,5 +1,13 @@
 # Spring 解决循环依赖
 
+参考文章 
+
+https://www.jianshu.com/p/6c359768b1dc
+
+https://blog.csdn.net/u010853261/article/details/77940767
+
+
+
 Spring容器中两种循环依赖方式
 
 * 构造器循环依赖
@@ -63,7 +71,7 @@ InitializeBean初始化  -- 调用spring xml的init方法
 * earlySingletonObjects 提前曝光的单例对象的cache
 * singletonObjects 单例对象cache
 
-我们创建bean的时候,首先想到的是从cache中获取到这个单例的bean,这个缓存就是singletonObjects.主要调用的方法就是
+我们创建bean的时候,首先想到的是从cache中获取到这个单例的bean,这个缓存就是singletonObjects.主要调用的方法就是`org.springframework.beans.factory.support.DefaultSingletonBeanRegistry`
 
 ```java
 
@@ -115,4 +123,66 @@ this.singletonFactories.remove(beanName);
 
 从singletonFactories中移除,并放入earlySingletonObjects中.其实就是从三级缓存放到二级缓存.
 
-https://blog.csdn.net/u010853261/article/details/77940767
+Spring解决循环依赖的诀窍就在于singletonFactories这个cache.这个cache中存的是类型为ObjectFactory,其定义如下
+
+```
+@FunctionalInterface
+public interface ObjectFactory<T> {
+
+	/**
+	 * Return an instance (possibly shared or independent)
+	 * of the object managed by this factory.
+	 * @return the resulting instance
+	 * @throws BeansException in case of creation errors
+	 */
+	T getObject() throws BeansException;
+
+}
+```
+
+在bean创建过程中,有两处比较重要的匿名内部类实现了该接口.
+
+`org.springframework.beans.factory.support.AbstractBeanFactory#doGetBean`
+
+```
+if (mbd.isSingleton()) {
+					sharedInstance = getSingleton(beanName, () -> {
+						try {
+							return createBean(beanName, mbd, args);
+						}
+						catch (BeansException ex) {
+							// Explicitly remove instance from singleton cache: It might have been put there
+							// eagerly by the creation process, to allow for circular reference resolution.
+							// Also remove any beans that received a temporary reference to the bean.
+							destroySingleton(beanName);
+							throw ex;
+						}
+					});
+					bean = getObjectForBeanInstance(sharedInstance, name, beanName, mbd);
+				}
+```
+
+`org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory#doCreateBean`
+
+```
+		if (earlySingletonExposure) {
+			if (logger.isTraceEnabled()) {
+				logger.trace("Eagerly caching bean '" + beanName +
+						"' to allow for resolving potential circular references");
+			}
+			addSingletonFactory(beanName, () -> getEarlyBeanReference(beanName, mbd, bean));
+		}
+```
+
+此处是解决循环依赖的关键,这段代码发生在createBeanInstance之后,也就是说单例对象此时已经被创建出来了.这个对象已经被生产出来了,虽然还不完美(还没有进行初始化的第二步和第三步),但是已经能被人认出来了(根据对象引用能定位到堆中对象).所以Spring此时将这个对象提前曝光出来让大家认识和使用
+
+
+
+这样做有什么好处呢？让我们来分析一下“A的某个field或者setter依赖了B的实例对象，同时B的某个field或者setter依赖了A的实例对象”这种循环依赖的情况。A首先完成了初始化的第一步，并且将自己提前曝光到singletonFactories中，此时进行初始化的第二步，发现自己依赖对象B，此时就尝试去get(B)，发现B还没有被create，所以走create流程，B在初始化第一步的时候发现自己依赖了对象A，于是尝试get(A)，尝试一级缓存singletonObjects(肯定没有，因为A还没初始化完全)，尝试二级缓存earlySingletonObjects（也没有），尝试三级缓存singletonFactories，由于A通过ObjectFactory将自己提前曝光了，所以B能够通过ObjectFactory.getObject拿到A对象(虽然A还没有初始化完全，但是总比没有好呀)，B拿到A对象后顺利完成了初始化阶段1、2、3，完全初始化之后将自己放入到一级缓存singletonObjects中。此时返回A中，A此时能拿到B的对象顺利完成自己的初始化阶段2、3，最终A也完成了初始化，长大成人，进去了一级缓存singletonObjects中，而且更加幸运的是，由于B拿到了A的对象引用，所以B现在hold住的A对象也蜕变完美了
+
+
+
+作者：LNAmp
+链接：https://www.jianshu.com/p/6c359768b1dc
+来源：简书
+著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。
