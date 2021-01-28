@@ -638,11 +638,11 @@ ReentrantLock有显示的操作过程,何时加锁,何时释放锁都在程序�
 
 #### Lock接口的主要方法
 
-* void lock()
-* boolean tryLock()
-* tryLock(long timeout,TimeUnit timeUnit)
-* void unlock
-* Condition newCondition()
+* void lock() 给对象加锁,若果锁未被其他线程使用,则当前线程获取该锁;如果锁正在被其他线程持有,则将引用当前线程,直到当前线程获取到锁.
+* boolean tryLock() 视图给对象加锁,如果锁未被其他线程使用,则将获取该锁并返回true,否则返回false.
+* tryLock(long timeout,TimeUnit timeUnit) 创建定时锁,如果在给定的等待时间内有可用锁,则获取该锁.
+* void unlock() 释放当前线程所持有的锁.锁只能由持有者释放,如果当前线程并不持有该锁却之心该方法,则抛出异常
+* Condition newCondition() 创建条件对象,获取等待通知组件.该组件和当前线程绑定,当前线程只有获取了锁才能调用该组件的await(),在调用后当前线程将释放锁.
 * getHoldCount()
 * getQueueLength()
 * getWaitQueueLength(Condition condition)
