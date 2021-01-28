@@ -627,9 +627,36 @@ ReentrantLock有显示的操作过程,何时加锁,何时释放锁都在程序�
 
 #### ReentrantLock如何避免死锁
 
-响应中断,可循轮锁,定时锁
+响应中断,可轮询锁,定时锁
 
-* 响应中断
+* 响应中断 在synchronized中如果有一个线程尝试获取锁,则结果是要么获取锁继续执行,要么保持等待.ReentrantLock还提供了可响应中断的可能,即在等待锁的过程中,线程可以根据需要取消对锁的请求.
+* 可轮询锁 通过`boolean tryLock()`获取锁.如果有可用锁,则获取该锁并返回true,如果无可用锁,则立即返回false
+* 定时锁 通过`boolean tryLock(long time,TimeUnit timeUnit)`获取定时锁.如果在给定的时间内获取到了可用锁,且当前线程未被中断,则获取到锁并返回true.如果在给定的时间内获取不到可用锁,将禁用当前线程,并且在发生以下三种情况之前,该线程将一直处于休眠状态
+  * 当前线程获取到了可用锁并返回true
+  * 当前线程在进入此方法时设置了该线程的中断状态,或者单签线程在获取锁时被中断,则抛出InterruptedException,并清除当前线程的中断状态
+  * 当前线程获取锁的时间超过指定的等待时间,则将返回false.如果设定的时间小于等于0,则该方法将完全不用等待;
+
+#### Lock接口的主要方法
+
+* void lock()
+* boolean tryLock()
+* tryLock(long timeout,TimeUnit timeUnit)
+* void unlock
+* Condition newCondition()
+* getHoldCount()
+* getQueueLength()
+* getWaitQueueLength(Condition condition)
+* hasWaiters(Condition condition)
+* hasQueuedThread(Thread thread)
+* hasQueuedTHreads()
+* isFair()
+* isHeldByCurrentThread()
+* isLock()
+* lockInterruptibly()
+
+#### tryLock lock 和 lockInteruptibly
+
+
 
 ### Synchronized VS ReentrantLock
 
