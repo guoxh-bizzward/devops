@@ -643,28 +643,60 @@ ReentrantLock有显示的操作过程,何时加锁,何时释放锁都在程序�
 * tryLock(long timeout,TimeUnit timeUnit) 创建定时锁,如果在给定的等待时间内有可用锁,则获取该锁.
 * void unlock() 释放当前线程所持有的锁.锁只能由持有者释放,如果当前线程并不持有该锁却之心该方法,则抛出异常
 * Condition newCondition() 创建条件对象,获取等待通知组件.该组件和当前线程绑定,当前线程只有获取了锁才能调用该组件的await(),在调用后当前线程将释放锁.
-* getHoldCount()
-* getQueueLength()
-* getWaitQueueLength(Condition condition)
-* hasWaiters(Condition condition)
-* hasQueuedThread(Thread thread)
-* hasQueuedTHreads()
-* isFair()
-* isHeldByCurrentThread()
-* isLock()
-* lockInterruptibly()
+* getHoldCount() 查询当前线程保持此锁的次数,也就是此线程执行lock芳芳的次数
+* getQueueLength() 返回等待此锁的线程估计数,比如启动了5个线程,1个线程获得锁,此时返回4
+* getWaitQueueLength(Condition condition)  返回在Condition条件下等待该锁的线程数量.比如有5个线程共用同一个condition对象,并且这5个线程都执行了condition的await方法,那么执行此方法将返回5.
+* hasWaiters(Condition condition) 查询是否有线程正在等待与给定条件有关的锁,即对于制定的condition对象,有多少线程执行了condition.await方法
+* hasQueuedThread(Thread thread) 查询给定的线程是否等待获取该锁
+* hasQueuedTHreads() 查询是否有线程等待该锁
+* isFair() 查询该锁是否为公平锁
+* isHeldByCurrentThread() 查询当前线程是否持有该锁,线程执行lock方法的前后状态分别为false和true
+* isLock() 判断此锁是否被线程占用
+* lockInterruptibly() 如果当前线程未被中断,则获取该锁.
 
 #### tryLock lock 和 lockInteruptibly
 
-
+* tryLock若有可用锁,则获取该锁并返回true,否则返回false.不会有延迟和等待;tryLock(long  timeout,TimeUnit unit)可以增加时间限制,如果超过了制定时间还没有获取到锁,则返回false
+* lock若有可用锁,则获取该锁并返回true,否则会一直等待直到获取到锁
+* 在锁中断时lockInterruptibly会抛出异常,lock不会.
 
 ### Synchronized VS ReentrantLock
 
+共同点
 
+* 都是控制多线程对共享对象的访问
+* 都是可重入锁
+* 保证了可见性和互斥性
 
+不同点
 
+* ReentrantLock 显示的获取和释放锁,Synchronized是隐式的.为了避免程序出现异常无法正常释放锁,在使用ReentrantLock的时候需要在finally中进行解锁操作
+* ReentrantLock提供了可响应中断,可轮询的锁,为处理锁提供了更多的灵活性
+* ReentrantLock 是API级的,Synchronized是jvm级的
+* ReentrantLock可以实现公平锁
+* ReentrantLock通过Condition可以绑定多个条件
+* 二者的实现底层不一样,Synchronized是同步阻塞,采用的是悲观并发策略;Lock是同步非阻塞,采用的是乐观并发策略 ??
+* Lock是一个接口,而Synchronized是java关键字,Synchronized是由内置的语言实现
+* 通过Lock可以知道有没有成功获取锁,Synchronized则不能
+* Lock可以通过分别定义读写锁提高多个线程读操作的效率.
 
 ### Semaphore
+
+semaphore是一种基于计数的信号量.在定义信号量对象时可以设定一个阈值,基于该阈值,多个线程竞争获取许可信号,线程竞争到许可信号后开始执行具体的业务逻辑,业务逻辑在执行完成后释放该信号量.在许可信号的竞争队列超过阈值后,新加入的许可信号的线程将被阻塞,直到有其他许可信号释放.
+
+```
+
+```
+
+Semaphore对锁的身躯和释放和ReentrantLock类似,通过acquire和release方法来获取和释放许可信号资源.Semaphore.acquire方法默认和ReentrantLock.lockInterruptibly方法的效果一样,为可响应中断锁.也就是说在等待许可信号资源的过程中可以被Thread.interrupt方法中断而取消对许可信号的申请.
+
+Semaphore也实现了可轮询的锁请求,定时锁的功能.以及公平锁和非公平锁的机制.
+
+Semaphore的释放锁也需要手动执行.
+
+```
+semaphore也可以用来实现一些对象池,资源池的构建,比如静态全局对象池,数据库连接池等.此外,我们也可以创建计数为1
+```
 
 
 
@@ -702,15 +734,37 @@ ReentrantLock有显示的操作过程,何时加锁,何时释放锁都在程序�
 
 ### 分段锁
 
-
+分段锁并非是一种实际的锁,而是一种思想.用于将数据分段并在每个分段上单独加锁,把锁进一步细粒度化,以提高并发效率.ConcurrentHashMap在内部就是使用了分段锁实现的.
 
 ### 同步锁和死锁
 
-
+在有多个线程同时被阻塞时,它们之间若互相等待对方释放资源,就会出现锁.为了避免出现死锁,可以为锁操作添加超时时间,在线程 持有锁超时后会自动释放锁.
 
 ### 如何进行锁优化
 
+#### 减少锁持有的时间
 
+减少锁持有的时间指 只在有线程安全要求的程序上加锁来尽量减少同步代码块对锁的持有时间
+
+#### 减少锁粒度
+
+指单个耗时较多的锁操作拆分为多个耗时较少的锁操作来增加锁的并行度,减少同一个锁上的竞争.在减少锁竞争后,偏向锁,轻量级锁的使用率才会提高.减少锁粒度的最典型案例就是ConconrrentHashMap中的分段锁
+
+#### 锁分离
+
+是指根据不同的场景将锁的功能进行分离,以应对不同的变化,最常见的锁分离思想就是读写锁(ReadWriteLock),它根据锁的功能将锁分离成读锁和写锁,这样读读不互斥,读写互斥,写写互斥,既保证了线程的安全性,有提供了性能.
+
+```
+操作分离思想可以进一步延伸为只要操作互不影响,就可以进一步拆分,比如LinkedBlockingQueue从头部取出数据,从尾部加入数据.
+```
+
+#### 锁粗化
+
+为了保障性能,会尽可能将锁的操作细化以减少线程持有锁的时间,但是如果锁分的太细,将会导致系统频繁获取锁和释放锁,反而影响性能的提升.在这种情况下,建议将关联性强的锁集中起来处理,以提高系统整体的效率.
+
+#### 锁消除
+
+在开发中经常会出现不需要使用锁的情况下误用了锁操作而引起性能下降,这多是因为程序编码不规范引起的.这时,我们需要检查并消除这些不必要的锁来提高系统的性能.
 
 
 
