@@ -3,7 +3,7 @@
 SpringBean 生命周期包括4类
 
 * bean自身方法 包括bean本身调用的方法和配置文件中配置的 `<bean>`的`init-method`和`destroy-method`指定的方法
-* bean声明周期接口方法 包括BeanNameAware,BeanFactoryAware,InitalizingBean和DiposableBean这些接口方法
+* bean声明周期接口方法 包括BeanNameAware,BeanFactoryAware,InitalizingBean和DisposableBean这些接口方法
 * 容器生命周期接口方法 包括了 InstantiationAwareBeanPostProcessor 和 BeanPostProcessor 这两个接口实现,一般称它们为 后处理器
 * 工厂后处理接口方法 包括了AspectJWeavingEnabler,ConfigurationClassPostProcessor,CustomAutowireConfigurer等非常有用的工厂后处理器.工厂后处理器也是容器级的.在应用上下文装配配置文件之后立即调用.
 
