@@ -1012,6 +1012,27 @@ Abstract Queued Synchronizer 抽象队列同步器,通过为一个共享资源�
 
 #### AQS原理
 
+AQS为每个共享资源都设置了一个共享资源锁,线程在需要访问共享资源时首先需要获取共享资源锁,如果获取到了共享资源锁,便可以在当前线程中使用该共享资源,如果获取不到,则将该线程放入线程等待队列,等待下一次资源调度.
+
+许多同步类的实现都依赖AQS,例如常用的ReentrantLock,Semaphore和countDownLatch
+
+#### state 状态
+
+AQS维护了一个volidate int类型的变量,用于表示当前的同步状态.volatile虽然不能保证操作的原子性,但是可以保证当前变量state的可见性
+
+state的访问方式有三种 getState(),setState()和compareAndSetState(),其中compareAndSetState的实现依赖于Unsafe的compareAndSwapInt().
+
+#### AQS共享资源的方式
+
+AQS定义了两种资源共享方式:独占式(Exclusive)和共享式(Share)
+
+* 独占式 只有一个线程能执行,具体java的实现是ReentrantLock
+* 共享式 多个线程可同时执行,具体java的实现是 CountDownLatch Semaphore
+
+```
+AQS只是一个框架,只定义了一个接口.具体资源的获取,释放都由自定义同步器去实现.
+```
+
 
 
 # 数据结构
